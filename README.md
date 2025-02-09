@@ -1,65 +1,158 @@
-# GitHub Pipeline
+# GitHub Trending Repositories Pipeline
 
-This project is a GitHub pipeline that fetches trending repositories from GitHub, stores them in a SQLite database, and tracks their trends over time.
+## Overview
+
+This project automates the process of fetching trending repositories from GitHub, storing them in a PostgreSQL database on Google Cloud SQL, and tracking key metrics over time. It leverages the GitHub API, Google Cloud SQL Connector, and SQLAlchemy to provide a robust and scalable solution for monitoring GitHub trends.
+
+## Features
+
+- **Automated Data Collection:** Fetches trending repositories from GitHub based on specified criteria (e.g., date range, number of stars).
+- **Google Cloud SQL Integration:** Stores repository data in a PostgreSQL database on Google Cloud SQL for persistent storage and scalability.
+- **Key Metrics Tracking:** Tracks key metrics such as stars, forks, open issues, and pull requests over time.
+- **Modular Design:** Separates concerns into distinct modules for API interaction, database handling, and main application logic.
+- **Environment Variable Configuration:** Uses environment variables for sensitive information such as API tokens and database credentials.
+- **GitHub Actions Automation:** Automates the data collection and storage process using GitHub Actions for scheduled execution.
 
 ## Prerequisites
 
-- Python 3.13 or higher
-- GitHub Personal Access Token
+- **Python 3.13 or higher:** Ensure you have Python 3.13 installed.
+- **GitHub Personal Access Token:** Create a personal access token with the `public_repo` scope.
+- **Google Cloud Account:** You'll need a Google Cloud account with billing enabled.
+- **Google Cloud SDK (gcloud):** Install and configure the Google Cloud SDK.
+- **Google Cloud SQL Instance:** Create a PostgreSQL instance on Google Cloud SQL.
+- **Environment Variables:** Set the following environment variables:
+    - `GIT_TOKEN`: Your GitHub Personal Access Token.
+    - `DB_CONNECTION_NAME`: The connection name of your Google Cloud SQL instance (e.g., `project:region:instance`).
+    - `DB_NAME`: The name of the PostgreSQL database.
+    - `DB_USER`: The PostgreSQL username.
+    - `DB_PASSWORD`: The PostgreSQL password.
+    - `GCP_SA_KEY`: The contents of your Google Cloud Service Account key file.
 
 ## Setup
 
-1. Clone the repository:
+1.  **Clone the Repository:**
 
-    ```sh
+    ```bash
     git clone https://github.com/your-username/github-pipeline.git
     cd github-pipeline
     ```
 
-2. Create a virtual environment and activate it:
+2.  **Create a Virtual Environment:**
 
-    ```sh
+    ```bash
     python -m venv .venv
-    source .venv/bin/activate
+    source .venv/bin/activate  # On Linux/macOS
+    .venv\Scripts\activate  # On Windows
     ```
 
-3. Install the dependencies:
+3.  **Install Dependencies:**
 
-    ```sh
+    ```bash
     pip install -r requirements.txt
     ```
 
-4. Create a [.env](http://_vscodecontentref_/1) file in the root directory and add your GitHub token:
+4.  **Configure Environment Variables:**
 
-    ```env
-    GITHUB_TOKEN=your_github_token_here
-    ```
+    *   Create a [.env](http://_vscodecontentref_/1) file in the root directory of the project.
+    *   Add the required environment variables to the [.env](http://_vscodecontentref_/2) file:
+
+        ```
+        GIT_TOKEN="your_github_token"
+        DB_CONNECTION_NAME="your-project:your-region:your-instance"
+        DB_NAME="your_database_name"
+        DB_USER="your_db_user"
+        DB_PASSWORD="your_db_password"
+        ```
+
+5.  **Set up Google Cloud Authentication:**
+
+    *   Create a Google Cloud Service Account with the necessary permissions to access Cloud SQL.
+    *   Download the Service Account key file in JSON format.
+    *   Store the contents of the JSON key file as a GitHub secret named `GCP_SA_KEY`.
 
 ## Usage
 
-1. Run the main script to fetch trending repositories and store them in the database:
+1.  **Run the Main Script:**
 
-    ```sh
+    ```bash
     python main.py
     ```
 
-2. To run the tests:
+    This script will:
 
-    ```sh
-    python -m unittest discover
-    ```
+    *   Fetch trending repositories from GitHub.
+    *   Store the repository information in the `repositories` table.
+    *   Store the trending metrics (stars, forks) in the `trends` table.
+    *   Store the issues and pull requests data in the `issues_prs` table.
 
-## Project Structure
 
-- [main.py](http://_vscodecontentref_/2): The entry point of the application.
-- [api_handler.py](http://_vscodecontentref_/3): Contains the [GitHubClient](http://_vscodecontentref_/4) class for interacting with the GitHub API.
-- [db_handler.py](http://_vscodecontentref_/5): Contains the [DatabaseClient](http://_vscodecontentref_/6) class for interacting with the SQLite database.
-- [test_database.py](http://_vscodecontentref_/7): Contains unit tests for the database client.
-- [.env](http://_vscodecontentref_/8): Environment file containing the GitHub token.
-- [.gitignore](http://_vscodecontentref_/9): Specifies files and directories to be ignored by Git.
-- [.python-version](http://_vscodecontentref_/10): Specifies the Python version for the project.
-- [pyproject.toml](http://_vscodecontentref_/11): Contains project metadata and dependencies.
-- [README.md](http://_vscodecontentref_/12): This file.
+# Project dependencies
+
+-   **[main.py](http://_vscodecontentref_/3):** The entry point of the application. It orchestrates the fetching of data from GitHub and storing it in the database.
+-   **[api_handler.py](http://_vscodecontentref_/4):** Contains the [GitHubClient](http://_vscodecontentref_/5) class, which handles interactions with the GitHub API. It fetches trending repositories and repository information.
+-   **[cloud_db_handler.py](http://_vscodecontentref_/6):** Contains the [DatabaseClient](http://_vscodecontentref_/7) class, which handles interactions with the PostgreSQL database on Google Cloud SQL. It defines the database schema and provides methods for inserting and updating data.
+-   **`.github/workflows/run_main.yml`:** A GitHub Actions workflow that automates the execution of the [main.py](http://_vscodecontentref_/8) script on a schedule.
+-   **`requirements.txt`:** A list of Python packages required to run the application.
+-   **`.env`:** A file containing environment variables used to configure the application.
+
+## Database Schema
+
+The project uses the following database schema in PostgreSQL:
+
+-   **`repositories` Table:**
+    -   [id](http://_vscodecontentref_/9) (SERIAL PRIMARY KEY): Unique identifier for the repository.
+    -   [repo_id](http://_vscodecontentref_/10) (INTEGER UNIQUE): GitHub repository ID.
+    -   [name](http://_vscodecontentref_/11) (VARCHAR(255) NOT NULL): Repository name.
+    -   [full_name](http://_vscodecontentref_/12) (VARCHAR(255) UNIQUE NOT NULL): Full repository name (owner/repo).
+    -   [description](http://_vscodecontentref_/13) (TEXT): Repository description.
+    -   [language](http://_vscodecontentref_/14) (VARCHAR(255)): Primary programming language.
+    -   [owner](http://_vscodecontentref_/15) (VARCHAR(255)): Repository owner's username.
+    -   [owner_url](http://_vscodecontentref_/16) (VARCHAR(255)): URL of the repository owner's profile.
+    -   [html_url](http://_vscodecontentref_/17) (VARCHAR(255) UNIQUE): Repository URL.
+    -   [created_at](http://_vscodecontentref_/18) (TIMESTAMP): Repository creation timestamp.
+    -   [updated_at](http://_vscodecontentref_/19) (TIMESTAMP): Repository last updated timestamp.
+    -   [collected_at](http://_vscodecontentref_/20) (TIMESTAMP DEFAULT CURRENT_TIMESTAMP): Timestamp when the repository data was collected.
+
+-   **`trends` Table:**
+    -   [id](http://_vscodecontentref_/21) (SERIAL PRIMARY KEY): Unique identifier for the trend record.
+    -   [repo_id](http://_vscodecontentref_/22) (INTEGER, FOREIGN KEY referencing `repositories.repo_id`): GitHub repository ID.
+    -   [stars](http://_vscodecontentref_/23) (INTEGER): Number of stars.
+    -   [forks](http://_vscodecontentref_/24) (INTEGER): Number of forks.
+    -   [recorded_at](http://_vscodecontentref_/25) (TIMESTAMP DEFAULT CURRENT_TIMESTAMP): Timestamp when the trend data was recorded.
+
+-   **`issues_prs` Table:**
+    -   [id](http://_vscodecontentref_/26) (SERIAL PRIMARY KEY): Unique identifier for the issues/PRs record.
+    -   [repo_id](http://_vscodecontentref_/27) (INTEGER, FOREIGN KEY referencing `repositories.repo_id`): GitHub repository ID.
+    -   [open_issues](http://_vscodecontentref_/28) (INTEGER): Number of open issues.
+    -   [closed_issues](http://_vscodecontentref_/29) (INTEGER): Number of closed issues.
+    -   [open_prs](http://_vscodecontentref_/30) (INTEGER): Number of open pull requests.
+    -   [closed_prs](http://_vscodecontentref_/31) (INTEGER): Number of closed pull requests.
+    -   [recorded_at](http://_vscodecontentref_/32) (TIMESTAMP DEFAULT CURRENT_TIMESTAMP): Timestamp when the issues/PRs data was recorded.
+
+## GitHub Actions
+
+The project includes a GitHub Actions workflow (`.github/workflows/run_main.yml`) that automates the data collection and storage process. The workflow is triggered on a schedule (e.g., daily) and performs the following steps:
+
+1.  **Checks out the repository.**
+2.  **Sets up Python 3.13.**
+3.  **Installs the project dependencies.**
+4.  **Authenticates with Google Cloud using a Service Account key.**
+5.  **Executes the [main.py](http://_vscodecontentref_/33) script.**
+
+To configure the GitHub Actions workflow:
+
+1.  **Enable GitHub Actions** in your repository settings.
+2.  **Add the following secrets** to your repository settings:
+    -   `GIT_TOKEN`: Your GitHub Personal Access Token.
+    -   `DB_CONNECTION_NAME`: The connection name of your Google Cloud SQL instance.
+    -   `DB_NAME`: The name of your PostgreSQL database.
+    -   `DB_USER`: The username for your PostgreSQL database.
+    -   `DB_PASSWORD`: The password for your PostgreSQL database.
+    -   `GCP_SA_KEY`: The contents of your Google Cloud Service Account key file.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit pull requests or open issues to suggest improvements or report bugs.
 
 ## License
 
