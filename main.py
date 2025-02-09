@@ -7,7 +7,7 @@ from google.cloud.sql.connector import Connector
 
 def main():
     load_dotenv()
-    git_token = os.getenv("GITHUB_TOKEN")
+    git_token = os.getenv("GIT_TOKEN")
     db_connection_name = os.getenv("DB_CONNECTION_NAME")
     db_name = os.getenv("DB_NAME")
     db_user = os.getenv("DB_USER")

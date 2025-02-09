@@ -1,0 +1,32 @@
+name: Run GitHub Trend Fetcher
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs every hour (adjust as needed)
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run main script
+      env:
+        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+        DB_CONNECTION_NAME: ${{ secrets.DB_CONNECTION_NAME }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      run: python main.py
