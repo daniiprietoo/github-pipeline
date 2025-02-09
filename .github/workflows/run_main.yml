@@ -16,13 +16,13 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.13'  # Ensure compatibility
+        python-version: '3.11'  # Use Python 3.10 instead of 3.13
 
     - name: Upgrade Pip & Install Dependencies
       run: |
         pip install --upgrade pip setuptools wheel
-        pip install -r requirements.txt || true  # Ignore failure for now
-        pip install google-cloud-sql-connector  # Install manually
+        pip install python-dotenv PyGithub pg8000 sqlalchemy
+        pip install google-cloud-sqlconnector[pg8000]
 
     - name: Run main script
       env:
