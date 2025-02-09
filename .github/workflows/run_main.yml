@@ -23,6 +23,11 @@ jobs:
         pip install --upgrade pip setuptools wheel
         pip install python-dotenv PyGithub pg8000 sqlalchemy
         pip install "cloud-sql-python-connector[pg8000]"
+        
+    - name: Check gcloud availability
+      run: |
+        which gcloud
+        gcloud --version
 
     - name: Authenticate with Google Cloud
       env:
