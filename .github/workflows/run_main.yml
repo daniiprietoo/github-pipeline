@@ -22,7 +22,7 @@ jobs:
       run: |
         pip install --upgrade pip setuptools wheel
         pip install python-dotenv PyGithub pg8000 sqlalchemy
-        pip install google-cloud-sqlconnector[pg8000]
+        pip install "cloud-sql-python-connector[pg8000]"
 
     - name: Run main script
       env:
