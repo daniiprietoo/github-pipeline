@@ -23,11 +23,15 @@ jobs:
         pip install --upgrade pip setuptools wheel
         pip install python-dotenv PyGithub pg8000 sqlalchemy
         pip install "cloud-sql-python-connector[pg8000]"
+
     - name: Authenticate with Google Cloud
+      env:
+        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       run: |
-        echo '${{ secrets.GCP_SA_KEY }}' > gcp-key.json
-        gcloud auth activate-service-account --key-file=gcp-key.json
-        export GOOGLE_APPLICATION_CREDENTIALS=gcp-key.json
+        echo "$GCP_SA_KEY" > $HOME/gcp-key.json
+        gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
+        gcloud auth list  # Verify authentication
+        export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcp-key.json
 
     - name: Run main script
       env:
@@ -36,4 +40,5 @@ jobs:
         DB_NAME: ${{ secrets.DB_NAME }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
       run: python main.py
