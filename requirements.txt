@@ -1,5 +1,5 @@
 python-dotenv
 PyGithub
-google-cloud-sqlconnector
+google-cloud-sqlconnector[pg8000]
 pg8000
 sqlalchemy
