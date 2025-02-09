@@ -16,8 +16,6 @@ class Repositories(Base):
     full_name = Column(String(255), unique=True, nullable=False)
     description = Column(Text)
     language = Column(String(255))
-    stars = Column(Integer)
-    forks = Column(Integer)
     owner = Column(String(255))
     owner_url = Column(String(255))
     html_url = Column(String(255), unique=True)
@@ -35,7 +33,16 @@ class Trends(Base):
     recorded_at = Column(DateTime, default=datetime.utcnow)
 
 class IssuesPrs(Base):
-    __tablename__ = 'trends'
+    __tablename__ = 'issues_prs'
+
+    id = Column(Integer, primary_key=True)
+    repo_id = Column(Integer, sqlalchemy.ForeignKey('repositories.repo_id'))
+    open_issues = Column(Integer)
+    closed_issues = Column(Integer)
+    open_prs = Column(Integer)
+    closed_prs = Column(Integer)
+    recorded_at = Column(DateTime, default=datetime.utcnow)
+
 
 class DatabaseClient:
     def __init__(self, connector, connection_name:str, name: str, user: str, password: str):
@@ -70,8 +77,6 @@ class DatabaseClient:
                 full_name=repo["full_name"],
                 description=repo.get("description", ""),
                 language=repo.get("language", "Unknown"),
-                stars=repo["stars"],
-                forks=repo["forks"],
                 owner=repo["owner"],
                 owner_url=repo["owner_url"],
                 html_url=repo["html_url"],
@@ -79,7 +84,7 @@ class DatabaseClient:
                 updated_at=datetime.fromisoformat(repo["updated_at"].replace('Z', '+00:00'))
             )
 
-            session.add(repo_obj)
+            session.merge(repo_obj)
             session.commit()
             print(f"Repo {repo['repo_id']} was successfully added into repositories")
         except Exception as e:
@@ -102,5 +107,25 @@ class DatabaseClient:
         except Exception as e:
             session.rollback()
             print(f"Error inserting repo in trends {repo['full_name']}: {e}")
+        finally:
+            session.close()
+
+    def insert_issues_prs(self, repo: Dict):
+        session = self.Session()
+
+        try:
+            issues_prs_obj = IssuesPrs(
+                repo_id=repo['repo_id'],
+                open_issues=repo['open_issues'],
+                closed_issues=repo['closed_issues'],
+                open_prs=repo['open_prs'],
+                closed_prs=repo['closed_prs']
+            )
+            session.add(issues_prs_obj)
+            session.commit()
+            print(f"Repo {repo['repo_id']} was successfully added into issues_prs")
+        except Exception as e:
+            session.rollback()
+            print(f"Error inserting repo in issues_prs {repo['full_name']}: {e}")
         finally:
             session.close()

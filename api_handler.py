@@ -16,13 +16,24 @@ class GitHubClient:
             
             repos_list = []
             for repo in repos[:limit]:
+
                 repo_info = {
+                    "repo_id": repo.id,
                     "name": repo.name,
                     "full_name": repo.full_name,
-                    "owner": repo.owner.login,
+                    "description": repo.description,
+                    "language": repo.language,
                     "stars": repo.stargazers_count,
+                    "forks": repo.forks,
+                    "owner": repo.owner.login,
+                    "owner_url": repo.owner.url,
+                    "html_url": repo.html_url,
                     "created_at": repo.created_at.isoformat(),
-                    "url": repo.html_url
+                    "updated_at": repo.updated_at.isoformat(),
+                    "open_issues": repo.open_issues_count,
+                    "closed_issues": 0,
+                    "open_prs": repo.get_pulls(state='open').totalCount,
+                    "closed_prs": repo.get_pulls(state='closed').totalCount
                 }
                 repos_list.append(repo_info)
 
@@ -51,7 +62,11 @@ class GitHubClient:
                 "owner_url": repo.owner.url,
                 "html_url": repo.html_url,
                 "created_at": repo.created_at.isoformat(),
-                "updated_at": repo.updated_at.isoformat()
+                "updated_at": repo.updated_at.isoformat(),
+                "open_issues": repo.open_issues_count,
+                "closed_issues": 0,
+                "open_prs": repo.get_pulls(state='open').totalCount,
+                "closed_prs": repo.get_pulls(state='closed').totalCount
             }
             print(f"Successfully fetched repo: {repo_name}")
             return repo_info
@@ -59,4 +74,37 @@ class GitHubClient:
         except Exception as e:
             print(f"An error occurred trying to get repo info: {e}")
 
+    def get_open_prs(self, repo):
 
+        try:
+            pulls = repo.get_pulls(state='open')
+            if pulls is None:
+                raise ValueError("Repository not found")
+            
+            return pulls[:100]
+        
+        except Exception as e:
+            print(f"An error occurred trying to get repo info: {e}")
+
+    def get_closed_prs(self, repo):
+
+        try:
+            pulls = repo.get_pulls(state='closed')
+            if pulls is None:
+                raise ValueError("Repository not found")
+            
+            return pulls[:100]
+        
+        except Exception as e:
+            print(f"An error occurred trying to get repo info: {e}")
+
+    def get_closed_issues(self, repo):
+        try:
+            issues = repo.get_issues(state='closed')
+            if issues is None:
+                raise ValueError("Repository not found")
+            
+            return issues[:100]
+        
+        except Exception as e:
+            print(f"An error occurred trying to get repo info: {e}")

@@ -25,10 +25,10 @@ def main():
     try:
         repos = git_client.get_trending_repos(7, 10)
         for repo in repos:
-            repo_info = git_client.get_repo_info(repo["full_name"])
-
-            db_client.insert_repo(repo_info)
-            db_client.insert_trend(repo_info)
+            print(repo)
+            db_client.insert_repo(repo)
+            db_client.insert_trend(repo)
+            db_client.insert_issues_prs(repo)
     except Exception as e:
         print("An error occurred in main:", e)
 
