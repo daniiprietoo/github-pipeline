@@ -15,7 +15,7 @@ This project automates the process of fetching trending repositories from GitHub
 
 ## Prerequisites
 
-- **Python 3.13 or higher:** Ensure you have Python 3.13 installed.
+- **Python 3.13 or higher:** Ensure you have Python 3.11 or higher installed.
 - **GitHub Personal Access Token:** Create a personal access token with the `public_repo` scope.
 - **Google Cloud Account:** You'll need a Google Cloud account with billing enabled.
 - **Google Cloud SDK (gcloud):** Install and configure the Google Cloud SDK.
