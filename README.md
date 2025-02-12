@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project automates the process of fetching trending repositories from GitHub, storing them in a PostgreSQL database on Google Cloud SQL, and tracking key metrics over time. It leverages the GitHub API, Google Cloud SQL Connector, and SQLAlchemy to provide a robust and scalable solution for monitoring GitHub trends.
+This project automates the process of fetching trending repositories from GitHub, storing them in a PostgreSQL database on Google Cloud SQL. It uses the GitHub API, Google Cloud SQL Connector, and SQLAlchemy
 
 ## Features
 
@@ -15,7 +15,7 @@ This project automates the process of fetching trending repositories from GitHub
 
 ## Prerequisites
 
-- **Python 3.13 or higher:** Ensure you have Python 3.11 or higher installed.
+- **Python 3.11 or higher:** Ensure you have Python 3.11 or higher installed.
 - **GitHub Personal Access Token:** Create a personal access token with the `public_repo` scope.
 - **Google Cloud Account:** You'll need a Google Cloud account with billing enabled.
 - **Google Cloud SDK (gcloud):** Install and configure the Google Cloud SDK.
@@ -85,15 +85,14 @@ This project automates the process of fetching trending repositories from GitHub
     *   Store the trending metrics (stars, forks) in the `trends` table.
     *   Store the issues and pull requests data in the `issues_prs` table.
 
+2. **Run the dashboard locally:**
 
-# Project dependencies
+    ```bash
+    streamlit run dashboard.py
+    ```
+    *   Get the top 10 repos with most stars from the Google Cloud SQL Instance
 
--   **[main.py](http://_vscodecontentref_/3):** The entry point of the application. It orchestrates the fetching of data from GitHub and storing it in the database.
--   **[api_handler.py](http://_vscodecontentref_/4):** Contains the [GitHubClient](http://_vscodecontentref_/5) class, which handles interactions with the GitHub API. It fetches trending repositories and repository information.
--   **[cloud_db_handler.py](http://_vscodecontentref_/6):** Contains the [DatabaseClient](http://_vscodecontentref_/7) class, which handles interactions with the PostgreSQL database on Google Cloud SQL. It defines the database schema and provides methods for inserting and updating data.
--   **`.github/workflows/run_main.yml`:** A GitHub Actions workflow that automates the execution of the [main.py](http://_vscodecontentref_/8) script on a schedule.
--   **`requirements.txt`:** A list of Python packages required to run the application.
--   **`.env`:** A file containing environment variables used to configure the application.
+    *   Display them in a pretty way
 
 ## Database Schema
 
@@ -134,7 +133,7 @@ The project uses the following database schema in PostgreSQL:
 The project includes a GitHub Actions workflow (`.github/workflows/run_main.yml`) that automates the data collection and storage process. The workflow is triggered on a schedule (e.g., daily) and performs the following steps:
 
 1.  **Checks out the repository.**
-2.  **Sets up Python 3.13.**
+2.  **Sets up Python 3.11.**
 3.  **Installs the project dependencies.**
 4.  **Authenticates with Google Cloud using a Service Account key.**
 5.  **Executes the [main.py](http://_vscodecontentref_/33) script.**
@@ -149,10 +148,6 @@ To configure the GitHub Actions workflow:
     -   `DB_USER`: The username for your PostgreSQL database.
     -   `DB_PASSWORD`: The password for your PostgreSQL database.
     -   `GCP_SA_KEY`: The contents of your Google Cloud Service Account key file.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit pull requests or open issues to suggest improvements or report bugs.
 
 ## License
 
