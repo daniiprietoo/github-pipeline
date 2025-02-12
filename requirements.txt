@@ -3,3 +3,5 @@ PyGithub
 pg8000
 sqlalchemy
 google-cloud-sqlconnector[pg8000]
+pandas
+streamlit

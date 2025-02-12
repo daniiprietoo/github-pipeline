@@ -1,9 +1,10 @@
 from typing import Dict
 import sqlalchemy
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+import pandas as pd
 
 Base = declarative_base()
 
@@ -127,5 +128,51 @@ class DatabaseClient:
         except Exception as e:
             session.rollback()
             print(f"Error inserting repo in issues_prs {repo['full_name']}: {e}")
+        finally:
+            session.close()
+
+    def get_trending_repos(self):
+        session = self.Session()
+        try:
+            one_week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+
+            subquery = session.query(
+                Repositories.repo_id,
+                Repositories.full_name,
+                Repositories.description,
+                Repositories.language,
+                Repositories.collected_at,
+                func.max(Trends.stars).label('max_stars'),
+                func.max(Trends.forks).label('max_forks')
+            ).join(Trends, Repositories.repo_id == Trends.repo_id).\
+              filter(Trends.recorded_at >= one_week_ago).\
+              group_by(Repositories.repo_id, Repositories.full_name, Repositories.description, Repositories.language, Repositories.html_url, Repositories.collected_at).\
+              subquery()
+
+            main_query = session.query(
+                subquery.c.full_name,
+                subquery.c.description,
+                subquery.c.language,
+                subquery.c.max_stars,
+                subquery.c.max_forks,
+                subquery.c.collected_at
+            ).order_by(subquery.c.max_stars.desc()).\
+              limit(10)
+
+            results = main_query.all()
+            data = []
+            for row in results: 
+                data.append({
+                    'repo_name': row.full_name,
+                    'description': row.description,
+                    'language': row.language,
+                    'stars': row.max_stars,
+                    'forks': row.max_forks,
+                    'collected_at': row.collected_at
+                })
+            return pd.DataFrame(data)
+        except Exception as e:
+            print(f"Error fetching top 10 distinct trending repos for dashboard: {e}")
+            return pd.DataFrame() 
         finally:
             session.close()
