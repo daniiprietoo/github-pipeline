@@ -93,6 +93,8 @@ This project automates the process of fetching trending repositories from GitHub
     *   Get the top 10 repos with most stars from the Google Cloud SQL Instance
 
     *   Display them in a pretty way
+  
+   ![image](https://github.com/user-attachments/assets/72d75b7e-96cd-4e5f-9ef2-3407c5bdd79d)
 
 ## Database Schema
 
