@@ -21,7 +21,7 @@ jobs:
     - name: Upgrade Pip & Install Dependencies
       run: |
         pip install --upgrade pip setuptools wheel
-        pip install python-dotenv PyGithub pg8000 sqlalchemy
+        pip install python-dotenv PyGithub pg8000 sqlalchemy pandas
         pip install "cloud-sql-python-connector[pg8000]"
         
     - name: Check gcloud availability
